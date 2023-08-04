@@ -1,3 +1,4 @@
+# Author: mmi
 # based on https://gitlab.com/festo-research/electric-automation/festo-edcon
 # example using single signal for both read and write
 # initial value for telegram 111 sent to servo

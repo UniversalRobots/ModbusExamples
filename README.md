@@ -8,4 +8,7 @@ Refer to release notes and script manual for more detailed description.
 
 # Examples
 
-Refer to each example README file.
+Examples showing efficient communication with modbus leveraging URScript improvements in 5.14.0 and later.
+- [Festo CMMT-AS servo drive control](festo-cmmt-as)
+- [Festo CPX Modbus bridge](festo-cpx)
+- [Wago 750-series Modbus bridge](wago-750)

@@ -1,3 +1,4 @@
+# Author: mmi
 # Create and connect signals for getting, and setting
 # state of external digital I/O
 # This example assumes that 2 modules are connected:
