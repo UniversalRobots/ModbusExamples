@@ -1,6 +1,6 @@
 # Control WAGO 750 series Modbus IO bridge
 
-Examples require Universal-Robots software 5.14.0 or later.
+Examples require [Universal-Robots software 5.14.0](https://www.universal-robots.com/articles/ur/release-notes/release-note-software-version-514xx/) or later.
 
 Efficient control of inputs and outputs of I/O modules connected to Modbus bridge.
 

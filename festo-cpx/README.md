@@ -1,6 +1,6 @@
 # Control Festo CPX Modbus IO bridge
 
-Examples require Universal-Robots software 5.14.0 or later.
+Examples require [Universal-Robots software 5.14.0](https://www.universal-robots.com/articles/ur/release-notes/release-note-software-version-514xx/) or later.
 
 Efficient control of inputs and outputs of I/O modules connected to Modbus bridge.
 Basic error handling routines are implemented.
@@ -12,6 +12,14 @@ There are two components:
 - festo_cpx_example.urp - example program that uses library functions to toggle outputs, and read inputs.
 
 Both files should be uploaded to the robot.
+
+## Testing with robot simulator
+IO bridge should be connected to the network and configured.
+Dockerized URSim 5.14 image is used to run a program.
+<picture>
+ <img alt="Animation showing program run on simulator" src="simulator-with-festo-cpx.gif">
+</picture>
+
 
 # Hardware setup
 
