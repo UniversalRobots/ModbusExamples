@@ -24,7 +24,11 @@ Simulator includes modbus client functionality. Follow instructions on dockerhub
 By default when simulator is started no external files can be accessed. Following command starts URSim mapping current folder into subfolder to programs in URSim:
 
 ```bash
+# Linux
 docker run -dit --rm -p 5900:5900 -v ./:/ursim/programs/modbus --name ursim universalrobots/ursim_e-series
+
+# Windows
+docker run -dit --rm -p 5900:5900 -v "$(PWD):/ursim/programs/modbus" --name ursim universalrobots/ursim_e-series
 ```
 
 # Contributing

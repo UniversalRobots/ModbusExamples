@@ -1,16 +1,19 @@
 # Author: mmi
 # based on https://gitlab.com/festo-research/electric-automation/festo-edcon
 # example using single signal for both read and write
+
 # initial value for telegram 111 sent to servo
 global cmd_buffer = [1086, 0, 0, 0, 16384, 0, 0, 0, 0, 16384, 16384]
 global stat_buffer = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 global err = 0
 
-# connect modbus client to servo drive
-# parameters:
-#   servo_ip - ip address
-#   timeout - connection timeout in seconds
-# returns True on connection success
+###
+# Connect modbus client to servo drive
+# @param servo_name string Unique servo name
+# @param servo_ip string IP address
+# @param timeout float Timeout for opening connection [s]
+# @returns bool True if connection confirmed
+###
 def festo_connect_servo(servo_name, servo_ip, timeout):
   # add signals for control, and status - 11 registers each
   modbus_add_rw_signal(servo_ip, 255, 100, 11, 0, 11, servo_name, True)
@@ -29,17 +32,23 @@ def festo_connect_servo(servo_name, servo_ip, timeout):
   return True
 end
 
+###
 # Read status and check if servo is in error state
-# returns True if error bit is set
+# @param servo_name string Unique name
+# @returns bool True if error bit is set
+###
 def festo_has_error(servo_name):
   stat_buffer = modbus_get_signal_status(servo_name, False)
   local zsw1 = integer_to_binary_list(stat_buffer[0])
   return zsw1[3]
 end
 
+###
 # Acknowledge pending error on servo drive
-# timeout - timeout in seconds
-# returns True if error was acknowledged and cleared
+# @param servo_name string Unique name
+# @param timeout float Timeout [s]
+# @returns bool True if error was acknowledged and cleared
+###
 def festo_acknowledge_fault(servo_name, timeout):
   # set malfunction acknowledge 1 and back to 0, then wait for fault to reset
   stw1 = integer_to_binary_list(cmd_buffer[0])
@@ -63,6 +72,11 @@ def festo_acknowledge_fault(servo_name, timeout):
   return False
 end
 
+###
+# Enable servo driver power stage
+# @param servo_name string Unique name
+# @returns bool True power stage successfuly enabled
+###
 def festo_enable_powerstage(servo_name):
   # check if robot has plc control
   stat_buffer = modbus_get_signal_status(servo_name, False)
@@ -94,12 +108,22 @@ def festo_enable_powerstage(servo_name):
   return False
 end
 
+###
 # Read current servo position
+# @param servo_name string Unique name
+# @returns int Current position in configured drive unit
+###
 def festo_get_position(servo_name):
   stat_buffer = modbus_get_signal_status(servo_name, False)
   return stat_buffer[6] * 65536 + stat_buffer[5]
 end
 
+###
+# Send move to absolute position command
+# @param servo_name string Unique name
+# @param position int Target position in drive units
+# @param velocity int Maximum velocity in drive units
+###
 def festo_start_move(servo_name, position, velocity):
   cmd_buffer[6] = floor(position / 65536)
   cmd_buffer[5] = position - cmd_buffer[6] * 65536
@@ -121,6 +145,13 @@ def festo_start_move(servo_name, position, velocity):
   sleep(0.2)
 end
 
+###
+# Wait until bit in status word is set
+# @param servo_name string Unique name
+# @param bit int Bit index
+# @param timeout float Timeout [s]
+# @returns bool True if bit was set, False on timeout or drive fault
+###
 def festo_wait_for_status_bit(servo_name, bit, timeout):
   local i = 0
   while i < timeout * 10:
@@ -143,6 +174,12 @@ def festo_wait_for_status_bit(servo_name, bit, timeout):
   return False
 end
 
+###
+# Stop drive motion, and reset all motion tasks.
+# @param servo_name string Unique name
+# @param timeout float Timeout [s]
+# @returns bool True if motion was stopped, False on timeout or drive fault
+###
 def festo_stop_motion_task(servo_name, timeout):
   cmd_buffer[6] = 0
   cmd_buffer[5] = 0
@@ -178,6 +215,14 @@ def festo_stop_motion_task(servo_name, timeout):
   return festo_wait_for_status_bit(servo_name, 13, timeout)
 end
 
+###
+# Move to absolute target position
+# @param servo_name string Unique name
+# @param position int Target position in drive units
+# @param velocity int Maximum velocity in drive units
+# @param timeout float Timeout [s]
+# @returns bool True if target position was reached, False on timeout or drive fault
+###
 def festo_move(servo_name, position, velocity, timeout):
   festo_start_move(servo_name, position, velocity)
   # wait a little more until motion starts
@@ -189,12 +234,24 @@ def festo_move(servo_name, position, velocity, timeout):
   return False
 end
 
+###
+# Read drive referenced status
+# @param servo_name string Unique name
+# @returns bool True drive is referenced
+###
 def festo_is_referenced(servo_name):
   stat_buffer = modbus_get_signal_status(servo_name, False)
   local zsw1 = integer_to_binary_list(stat_buffer[0])
   return zsw1[11]
 end  
 
+###
+# Execute drive referencing (homing)
+# @param servo_name string Unique name
+# @param homing_method bool True - use homing method configured in servo drive, False - use current position as home
+# @param timeout float Timeout [s]
+# @returns bool True referencing succeeded, False on timeout or drive fault
+###
 def festo_reference(servo_name, homing_method, timeout):
   textmsg("FESTO: referencing, method=", homing_method)
 
